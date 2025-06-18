@@ -1,8 +1,9 @@
 # BookReview_SharingPlatform
 
-**Họ tên sinh viên:** [Điền họ tên của bạn]  
-**Mã sinh viên:** [Điền mã sinh viên của bạn]
-
+**Họ tên sinh viên:** [Trần Văn Bun]  
+**Mã sinh viên:** [23010370]
+**Lớp: K17_CNTT-4
+**Môn học: Web nâng cao (TH4)
 ---
 
 ## Giới thiệu Project
@@ -110,3 +111,30 @@ class Book extends Model
         return $this->hasMany(Comment::class);
     }
 }
+### Model: Comment
+<?php
+// filepath: [Comment.php](http://_vscodecontentref_/1)
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Comment extends Model
+{
+    protected $fillable = ['user_id', 'book_id', 'parent_id', 'content'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function book()
+    {
+        return $this->belongsTo(Book::class);
+    }
+
+    public function replies()
+    {
+        return $this->hasMany(Comment::class, 'parent_id');
+    }
+}
+
