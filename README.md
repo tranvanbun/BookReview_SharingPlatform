@@ -532,6 +532,79 @@ public function logout(Request $request)
         return redirect()->back()->with('success', 'Thêm thể loại thành công!');
     }
 ```
+##📄 Blade Template (View)
+![image](https://github.com/user-attachments/assets/19ca4b64-50e0-4ce2-8627-7a2af607200b)
+```
+##🌐 Routes
+```php
+// File: routes/web.php
+
+// ============ AUTH (Đăng nhập, Đăng ký, Đăng xuất) ============
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// ============ GIAO DIỆN NGƯỜI DÙNG ============
+Route::middleware(['auth'])->group(function () {
+    // Trang chủ
+    Route::get('/', [BookController::class, 'featuredBooks'])->name('main');
+    Route::get('/da', [BookController::class, 'featuredBooks'])->name('books.home');
+
+    // Trang hồ sơ cá nhân
+    Route::get('/profile', fn () => view('main.profile'))->name('profile');
+    Route::get('/dashboard/profile', fn () => view('main.profile'))->name('profile');
+    Route::put('/user/{id}', [AuthController::class, 'update'])->name('user.update');
+
+    // Liên hệ / Góp ý
+    Route::get('/dashboard/contact', fn () => view('main.contact'))->name('contactMe');
+    Route::post('/contact', [AuthController::class, 'submit'])->name('contact.submit');
+
+    // Bài viết cá nhân
+    Route::get('/dashboard/mypost', fn () => view('main.mypost'))->name('myPost');
+    Route::delete('/books/{id}', [BookController::class, 'destroy'])->name('booksUser.destroy');
+
+    // Chi tiết sách
+    Route::get('/readBook/{id}', [BookController::class, 'readBook'])->name('books.show');
+    Route::get('/sameGenreBooks/{id}', [BookController::class, 'sameGenreBooks'])->name('sameGenreBooks');
+
+    // Tương tác với sách
+    Route::post('/books/{book}/favorite', [BookController::class, 'toggleFavorite']);
+    Route::post('/books/{book}/watchlater', [BookController::class, 'toggleWatchLater']);
+
+    // Bình luận
+    Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('/comments/reply', [CommentController::class, 'reply'])->name('comments.reply');
+});
+
+// ============ ĐĂNG SÁCH MỚI ============
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
+Route::post('/books', [BookController::class, 'store'])->name('books.store');
+
+// ============ QUẢN TRỊ VIÊN ============
+Route::middleware(['auth', 'admin:admin'])->group(function () {
+    // Dashboard quản trị
+    Route::get('/admin/dashboard', [AdminController::class, 'bookIndex'])->name('admin.dashboard');
+
+    // Quản lý người dùng
+    Route::get('/admin/userManager', [AdminController::class, 'index'])->name('users.index');
+    Route::delete('/admin/userManager/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+    Route::patch('/admin/users/{id}/role', [AdminController::class, 'updateRole'])->name('users.updateRole');
+
+    // Phê duyệt và xóa bài viết
+    Route::put('/admin/approve/{id}', [AdminController::class, 'approve'])->name('books.approve');
+    Route::delete('/admin/dashboard/{id}', [AdminController::class, 'destroyBook'])->name('books.destroy');
+
+    // Quản lý liên hệ
+    Route::get('/admin/notification', [AdminController::class, 'indexContact'])->name('admin.notification');
+    Route::post('/admin/notification/read/{id}', [AdminController::class, 'markAsRead'])->name('admin.contacts.markAsRead');
+    Route::delete('/admin/notification/delete/{id}', [AdminController::class, 'deleteNotification'])->name('admin.contacts.destroy');
+
+    // Quản lý thể loại
+    Route::get('/admin/categori', [AdminController::class, 'showCategories'])->name('admin.categori');
+    Route::post('/admin/addcategori', [AdminController::class, 'store'])->name('categories.store');
+```
 ## 7. Công nghệ sử dụng
 
 | Công nghệ       | Mô tả                          |
