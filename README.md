@@ -532,10 +532,10 @@ public function logout(Request $request)
         return redirect()->back()->with('success', 'Thêm thể loại thành công!');
     }
 ```
-##📄 Blade Template (View)
+### 📄 Blade Template (View)
 ![image](https://github.com/user-attachments/assets/19ca4b64-50e0-4ce2-8627-7a2af607200b)
 ```
-##🌐 Routes
+### 🌐Routes
 ```php
 // File: routes/web.php
 
@@ -604,6 +604,31 @@ Route::middleware(['auth', 'admin:admin'])->group(function () {
     // Quản lý thể loại
     Route::get('/admin/categori', [AdminController::class, 'showCategories'])->name('admin.categori');
     Route::post('/admin/addcategori', [AdminController::class, 'store'])->name('categories.store');
+```
+### 🔒 Bảo Mật
++CSRF Protection (Chống giả mạo yêu cầu liên trang)
+Laravel tự động bảo vệ các form bằng CSRF token.
+Tất cả các form đều sử dụng @csrf để đảm bảo chỉ nhận request hợp lệ.
++XSS Protection (Chống tấn công chèn mã độc)
+Dữ liệu đầu ra được escape bằng cú pháp {{ $variable }} trong Blade.
+Không render HTML trực tiếp từ dữ liệu người dùng.
++Phân quyền:
+1. Xác thực người dùng
+Laravel built-in authentication (Auth) được sử dụng để xác định danh tính người dùng.
+Các route yêu cầu đăng nhập đều được bảo vệ bằng middleware auth.
+```php
+Route::middleware(['auth'])->group(function () {
+    // Chỉ người dùng đã đăng nhập mới truy cập được các route này
+});
+```
+2. Phân quyền theo vai trò (Admin/User)
+Mỗi người dùng có trường role trong bảng users, mặc định là user.
+Admin được xác định khi role === 'admin'.
+```php
+Route::middleware(['auth', 'admin:admin'])->group(function () {
+    // Chỉ admin mới truy cập được
+});
+
 ```
 ## 7. Công nghệ sử dụng
 
