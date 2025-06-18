@@ -202,28 +202,6 @@ class Comment extends Model
     }
 }
 ```
-
----
-
-## 7. Công nghệ sử dụng
-
-| Công nghệ       | Mô tả                          |
-|----------------|---------------------------------|
-| **Laravel 10** | Backend PHP Framework chính.   |
-| **Blade**      | Template engine dùng hiển thị. |
-| **Bootstrap 5**| Giao diện responsive.           |
-| **MySQL**      | Cơ sở dữ liệu quan hệ.         |
-| **jQuery/AJAX**| Tải động bình luận, yêu thích. |
-
----
-
-## 8. Kết luận
-
-Dự án **BookReview_SharingPlatform** là một ứng dụng thực tế giúp người dùng yêu thích sách có thể chia sẻ, khám phá, và tương tác với nhau. Qua dự án này, em đã rèn luyện được các kỹ năng:
-- Sử dụng Laravel để phát triển ứng dụng web.
-- Làm việc với cơ sở dữ liệu quan hệ.
-- Xử lý logic xác thực, phân quyền, và tương tác người dùng.
-- Triển khai hệ thống bình luận đa cấp và thống kê dữ liệu (yêu thích, lượt xem).
 ### 6.4. Controller: CommentController (store & reply)
 
 ```php
@@ -261,3 +239,22 @@ public function reply(Request $request)
     return back()->with('success', 'Đã gửi trả lời.');
 }
 ```
+## 7. Công nghệ sử dụng
+
+| Công nghệ       | Mô tả                          |
+|----------------|---------------------------------|
+| **Laravel 10** | Backend PHP Framework chính.   |
+| **Blade**      | Template engine dùng hiển thị. |
+| **Bootstrap 5**| Giao diện responsive.           |
+| **MySQL**      | Cơ sở dữ liệu quan hệ.         |
+| **jQuery/AJAX**| Tải động bình luận, yêu thích. |
+---
+
+## 8. Kết luận
+
+Dự án **BookReview_SharingPlatform** là một ứng dụng thực tế giúp người dùng yêu thích sách có thể chia sẻ, khám phá, và tương tác với nhau. Qua dự án này, em đã rèn luyện được các kỹ năng:
+- Sử dụng Laravel để phát triển ứng dụng web.
+- Làm việc với cơ sở dữ liệu quan hệ.
+- Xử lý logic xác thực, phân quyền, và tương tác người dùng.
+- Triển khai hệ thống bình luận đa cấp và thống kê dữ liệu (yêu thích, lượt xem).
+- ---
