@@ -33,22 +33,188 @@
 | **Contact**   | Form liên hệ/phản hồi người dùng gửi đến quản trị viên.             |
 
 ---
+## 3.1 Sơ đồ khối
 
+
+```mermaid
+erDiagram
+  USERS ||--o{ BOOKS : has
+  USERS ||--o{ COMMENTS : writes
+  USERS ||--o{ REVIEWS : writes
+  USERS ||--o{ FAVORITES : marks
+  USERS ||--o{ WATCH_LATERS : saves
+  USERS ||--o{ WAITING : requests
+
+  CATEGORIES ||--o{ BOOKS : categorizes
+  CATEGORIES ||--o{ WAITING : requested_in
+
+  BOOKS ||--o{ COMMENTS : receives
+  BOOKS ||--o{ REVIEWS : receives
+  BOOKS ||--o{ FAVORITES : is_favorited
+  BOOKS ||--o{ WATCH_LATERS : is_saved
+
+  COMMENTS ||--o{ COMMENTS : replies
+
+  USERS {
+    int id PK
+    varchar name
+    varchar email
+    timestamp email_verified_at
+    varchar password
+    varchar avatar
+    text bio
+    varchar role
+    varchar phone
+    varchar contact
+    varchar address
+    varchar remember_token
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  CATEGORIES {
+    int id PK
+    varchar name
+    text description
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  BOOKS {
+    int id PK
+    int id_user FK
+    varchar title
+    varchar author
+    text description
+    varchar cover_img
+    varchar link
+    int genre_id FK
+    int views
+    int favorites
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  COMMENTS {
+    int id PK
+    int user_id FK
+    int book_id FK
+    int parent_id FK
+    text content
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  REVIEWS {
+    int id PK
+    int user_id FK
+    int book_id FK
+    text content
+    int likeNumber
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  FAVORITES {
+    int id PK
+    int user_id FK
+    int book_id FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  WATCH_LATERS {
+    int id PK
+    int user_id FK
+    int book_id FK
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  WAITING {
+    int id PK
+    int id_user FK
+    varchar title
+    varchar author
+    text description
+    varchar cover_img
+    varchar link
+    int genre_id FK
+    varchar status
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  CONTACTS {
+    int id PK
+    varchar name
+    varchar email
+    text message
+    varchar status
+    timestamp created_at
+    timestamp updated_at
+  }
+```
 ## 3. Sơ đồ lớp (Class Diagram)
 
 ```mermaid
 classDiagram
-    User <|-- Book
-    User <|-- Comment
-    Book <|-- Comment
-    Book <|-- Wait
-    Book <|-- Category
     User "1" -- "*" Book : đăng
     User "1" -- "*" Comment : viết
     Book "1" -- "*" Comment : có
     Book "*" -- "1" Category : thuộc
+    Book <|-- Wait
     User "*" -- "*" Book : favorites
     User "*" -- "*" Book : watchLater
+
+    class User {
+        id
+        name
+        email
+        password
+        avatar
+        bio
+        role
+        // ...
+    }
+    class Book {
+        id
+        id_user
+        title
+        author
+        description
+        cover_img
+        link
+        genre_id
+        views
+        favorites
+        // ...
+    }
+    class Wait {
+        id
+        id_user
+        title
+        author
+        description
+        cover_img
+        link
+        genre_id
+        status
+        // ...
+    }
+    class Comment {
+        id
+        user_id
+        book_id
+        parent_id
+        content
+        // ...
+    }
+    class Category {
+        id
+        name
+        // ...
+    }
 ```
 
 ---
@@ -73,12 +239,75 @@ flowchart TD
     C --> D[Sắp xếp giảm dần]
     D --> E[Hiển thị sách có lượt yêu thích cao nhất]
 ```
-
+### 4.3. Đăng sách mới (User gửi bài chờ duyệt)
+```mermaid
+sequenceDiagram
+    participant User
+    participant Browser
+    participant BookController
+    participant WaitModel
+    User->>Browser: Nhập thông tin sách, nhấn "Lưu"
+    Browser->>BookController: POST /books/store (dữ liệu sách)
+    BookController->>WaitModel: Kiểm tra trùng lặp
+    alt Không trùng lặp
+        BookController->>WaitModel: Tạo bản ghi sách chờ duyệt
+        WaitModel-->>BookController: Trả về kết quả
+        BookController->>Browser: Redirect + thông báo thành công
+    else Trùng lặp
+        BookController->>Browser: Redirect + thông báo lỗi
+    end
+```
+### 4.4. Admin phê duyệt sách
+```mermaid
+sequenceDiagram
+    participant Admin
+    participant Browser
+    participant AdminController
+    participant WaitModel
+    participant BookModel
+    Admin->>Browser: Nhấn "Phê duyệt" sách
+    Browser->>AdminController: PUT /books/{id}/approve
+    AdminController->>WaitModel: Lấy thông tin sách chờ duyệt
+    AdminController->>BookModel: Tạo bản ghi sách chính thức
+    AdminController->>WaitModel: Xóa bản ghi chờ duyệt
+    AdminController->>Browser: Redirect + thông báo thành công
+```
+### 4.5. Bình luận sách
+```mermaid
+sequenceDiagram
+    participant User
+    participant Browser
+    participant CommentController
+    participant CommentModel
+    User->>Browser: Nhập bình luận, nhấn "Gửi"
+    Browser->>CommentController: POST /comments/store
+    CommentController->>CommentModel: Tạo bản ghi bình luận
+    CommentModel-->>CommentController: Trả về kết quả
+    CommentController->>Browser: Redirect + thông báo thành công
+```
+### 4.6.  Yêu thích/Xem sau sách
+```mermaid
+sequenceDiagram
+    participant User
+    participant Browser
+    participant BookController
+    participant UserModel
+    participant BookModel
+    User->>Browser: Nhấn nút "Yêu thích" hoặc "Xem sau"
+    Browser->>BookController: POST /books/{id}/favorite hoặc /watchlater
+    BookController->>UserModel: Kiểm tra trạng thái hiện tại
+    alt Đã yêu thích/xem sau
+        BookController->>UserModel: Bỏ liên kết
+        BookController->>BookModel: Giảm lượt yêu thích (nếu là favorite)
+    else Chưa yêu thích/xem sau
+        BookController->>UserModel: Thêm liên kết
+        BookController->>BookModel: Tăng lượt yêu thích (nếu là favorite)
+    end
+    BookController->>Browser: Trả về trạng thái mới (JSON)
+```
 ---
 
 ## 5. Chức năng chính (Ảnh chụp màn hình)
-
-> *(Lưu ý: bạn nên chèn ảnh minh họa từ giao diện thật vào file PDF hoặc Word nộp)*
 
 - Giao diện đăng ký / đăng nhập.
 - Đăng sách mới.
@@ -628,8 +857,35 @@ Admin được xác định khi role === 'admin'.
 Route::middleware(['auth', 'admin:admin'])->group(function () {
     // Chỉ admin mới truy cập được
 });
-
 ```
+### 🖼️ Giao Diện Website
+## 🔐 Trang Xác Thực
+## Đăng ký
+![image](https://github.com/user-attachments/assets/28853784-9b9a-4303-bc09-22d0bfc85890)
+## Đăng nhập
+![image](https://github.com/user-attachments/assets/0dcb1449-d89c-4b3f-890e-289effaa90c2)
+### Giao diện người dùng
+## Home
+![image](https://github.com/user-attachments/assets/b2f177f8-0f26-479a-bab1-69d83992f42b)
+## Chỉnh sửa trang cá nhân 
+![image](https://github.com/user-attachments/assets/1896753c-ce56-4e61-b23c-0f00d337d571)
+## Danh sách bài đăng/chờ duyệt
+![image](https://github.com/user-attachments/assets/405fefe3-0d99-4e1e-bae3-9193cb71c803)
+## Thêm bài đăng
+![image](https://github.com/user-attachments/assets/0c493ee7-6202-4c78-9f5b-9491b8157728)
+## Giao diện phần xem sách
+![image](https://github.com/user-attachments/assets/a0a6d86f-b578-4bd2-be36-c21f86811f96)
+### Giao diện Admin
+## Phần duyệt bài đăng
+![image](https://github.com/user-attachments/assets/9142ff3c-a9a0-45b5-ba1a-6bfb4bd31b4c)
+## Quản lý người dùng
+![image](https://github.com/user-attachments/assets/05ec868a-4560-47cd-a5a1-840ab375544c)
+## Thêm thể loại
+![image](https://github.com/user-attachments/assets/8b194773-d5dc-4b0c-b179-2d545db02044)
+## Nhận phải hồi từ người dùng
+![image](https://github.com/user-attachments/assets/146423e8-9772-4649-8adf-1cfe638fd5e2)
+
+
 ## 7. Công nghệ sử dụng
 
 | Công nghệ       | Mô tả                          |
