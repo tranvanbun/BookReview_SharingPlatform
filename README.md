@@ -1,31 +1,39 @@
-# BookReview_SharingPlatform
+BookReview_SharingPlatform
+Họ tên sinh viên: Trần Văn Bun
+Mã sinh viên: 23010370
+Lớp: K17_CNTT-4
+Môn học: Web nâng cao (TH4)
 
-**Họ tên sinh viên:** [Trần Văn Bun]  
-**Mã sinh viên:** [23010370]
-**Lớp: K17_CNTT-4
-**Môn học: Web nâng cao (TH4)
----
+1. Giới thiệu Project
+BookReview_SharingPlatform là một nền tảng chia sẻ và đánh giá sách trực tuyến. Ứng dụng cho phép người dùng:
 
-## Giới thiệu Project
+Đăng ký/đăng nhập tài khoản.
 
-BookReview_SharingPlatform là ứng dụng web cho phép người dùng đăng tải, chia sẻ, bình luận và đánh giá sách. Ứng dụng hỗ trợ xác thực, phân quyền, quản lý sách, quản lý người dùng, bình luận và trả lời bình luận.
+Đăng tải sách.
 
----
+Bình luận, trả lời bình luận.
 
-## Đối tượng chính trong hệ thống
+Yêu thích và lưu sách để đọc sau.
 
-- **User:** Người dùng đăng ký, đăng nhập, đăng bài, bình luận, yêu thích, xem sau.
-- **Book:** Sách đã được duyệt, hiển thị trên hệ thống.
-- **Wait:** Sách chờ duyệt (người dùng gửi lên, admin duyệt mới thành sách chính thức).
-- **Comment:** Bình luận và trả lời bình luận cho sách.
-- **Category:** Thể loại sách.
-- **Contact:** Liên hệ/phản hồi từ người dùng.
+Quản lý sách chờ duyệt (chỉ Admin).
 
----
+Xem sách theo thể loại, sách nổi bật, sách mới.
 
-## Sơ đồ cấu trúc (Class Diagram)
+Ứng dụng được xây dựng bằng Laravel kết hợp Blade Template, Bootstrap, và sử dụng MySQL để lưu trữ dữ liệu.
 
-```mermaid
+2. Các đối tượng chính trong hệ thống
+Đối tượng	Mô tả
+User	Người dùng hệ thống, có thể đăng ký, đăng nhập, bình luận, yêu thích.
+Book	Sách đã được duyệt, hiển thị công khai cho mọi người.
+Wait	Sách do người dùng đăng, chờ admin kiểm duyệt.
+Comment	Bình luận và trả lời bình luận cho sách.
+Category	Thể loại sách.
+Contact	Form liên hệ/phản hồi người dùng gửi đến quản trị viên.
+
+3. Sơ đồ lớp (Class Diagram)
+mermaid
+Sao chép
+Chỉnh sửa
 classDiagram
     User <|-- Book
     User <|-- Comment
@@ -38,52 +46,45 @@ classDiagram
     Book "*" -- "1" Category : thuộc
     User "*" -- "*" Book : favorites
     User "*" -- "*" Book : watchLater
-```
-
----
-
-## Sơ đồ thuật toán (Activity Diagram)
-
-### Hiển thị tất cả bình luận của một cuốn sách
-
-```mermaid
+4. Sơ đồ hoạt động (Activity Diagram)
+4.1. Hiển thị tất cả bình luận của một cuốn sách
+mermaid
+Sao chép
+Chỉnh sửa
 flowchart TD
     A[User chọn sách] --> B[Lấy ID sách]
     B --> C[Truy vấn tất cả comment theo book_id]
     C --> D[Hiển thị danh sách comment]
-```
-
-### Tìm kiếm sách được yêu thích nhiều nhất
-
-```mermaid
+4.2. Tìm kiếm sách được yêu thích nhiều nhất
+mermaid
+Sao chép
+Chỉnh sửa
 flowchart TD
     A[User truy cập trang chủ] --> B[Lấy danh sách sách]
     B --> C[Đếm số lượt yêu thích mỗi sách]
     C --> D[Sắp xếp giảm dần]
     D --> E[Hiển thị sách có lượt yêu thích cao nhất]
-```
+5. Chức năng chính (Ảnh chụp màn hình)
+(Lưu ý: bạn nên chèn ảnh minh họa từ giao diện thật vào file PDF hoặc Word nộp)
 
----
+Giao diện đăng ký / đăng nhập.
 
-## Ảnh chụp màn hình chức năng chính
+Đăng sách mới.
 
-- Đăng nhập/Đăng ký
-- Đăng sách mới
-- Duyệt sách chờ phê duyệt (admin)
-- Bình luận, trả lời bình luận
-- Yêu thích/Xem sau sách
-- Trang chủ: Sách nổi bật, sách mới đăng
+Trang duyệt sách (Admin).
 
-*(Chèn ảnh chụp màn hình vào đây)*
+Giao diện bình luận / trả lời bình luận.
 
----
+Danh sách sách yêu thích / xem sau.
 
-## Code minh họa phần chính project
+Trang chủ: hiển thị sách nổi bật, sách mới đăng.
 
-### Model: Book
-
-````php
-// filepath: [Book.php](http://_vscodecontentref_/0)
+6. Code minh họa các phần chính
+6.1. Model Book
+php
+Sao chép
+Chỉnh sửa
+// File: app/Models/Book.php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -102,18 +103,22 @@ class Book extends Model
         'views',
         'favorites'
     ];
+
     public function genre()
     {
         return $this->belongsTo(Category::class, 'genre_id');
     }
+
     public function comments()
     {
         return $this->hasMany(Comment::class);
     }
 }
-### Model: Comment
-<?php
-// filepath: [Comment.php](http://_vscodecontentref_/1)
+6.2. Model Comment
+php
+Sao chép
+Chỉnh sửa
+// File: app/Models/Comment.php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -137,4 +142,10 @@ class Comment extends Model
         return $this->hasMany(Comment::class, 'parent_id');
     }
 }
-
+7. Công nghệ sử dụng
+Công nghệ	Mô tả
+Laravel 10	Backend PHP Framework chính.
+Blade	Template engine dùng hiển thị.
+Bootstrap 5	Giao diện responsive.
+MySQL	Cơ sở dữ liệu quan hệ.
+jQuery/AJAX	Tải động bình luận, yêu thích.
