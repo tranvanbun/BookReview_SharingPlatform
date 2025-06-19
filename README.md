@@ -38,20 +38,21 @@
 
 ```mermaid
 erDiagram
-  USERS ||--o{ BOOKS : has
-  USERS ||--o{ COMMENTS : writes
-  USERS ||--o{ REVIEWS : writes
-  USERS ||--o{ FAVORITES : marks
+  USERS ||--o{ BOOKS : writes
+  USERS ||--o{ COMMENTS : comments
+  USERS ||--o{ FAVORITES : favorites
   USERS ||--o{ WATCH_LATERS : saves
-  USERS ||--o{ WAITING : requests
-
-  CATEGORIES ||--o{ BOOKS : categorizes
-  CATEGORIES ||--o{ WAITING : requested_in
+  USERS ||--o{ WAITS : requests
+  USERS ||--o{ FOLLOWS : follows
+  USERS ||--o{ FOLLOWED : followed_by
 
   BOOKS ||--o{ COMMENTS : receives
-  BOOKS ||--o{ REVIEWS : receives
   BOOKS ||--o{ FAVORITES : is_favorited
   BOOKS ||--o{ WATCH_LATERS : is_saved
+  BOOKS ||--o{ CATEGORIES : belongs_to
+
+  CATEGORIES ||--o{ BOOKS : includes
+  CATEGORIES ||--o{ WAITS : requested_in
 
   COMMENTS ||--o{ COMMENTS : replies
 
@@ -59,30 +60,17 @@ erDiagram
     int id PK
     varchar name
     varchar email
-    timestamp email_verified_at
     varchar password
     varchar avatar
     text bio
     varchar role
-    varchar phone
-    varchar contact
-    varchar address
-    varchar remember_token
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  CATEGORIES {
-    int id PK
-    varchar name
-    text description
     timestamp created_at
     timestamp updated_at
   }
 
   BOOKS {
     int id PK
-    int id_user FK
+    int user_id FK
     varchar title
     varchar author
     text description
@@ -91,6 +79,13 @@ erDiagram
     int genre_id FK
     int views
     int favorites
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  CATEGORIES {
+    int id PK
+    varchar name
     timestamp created_at
     timestamp updated_at
   }
@@ -105,22 +100,11 @@ erDiagram
     timestamp updated_at
   }
 
-  REVIEWS {
-    int id PK
-    int user_id FK
-    int book_id FK
-    text content
-    int likeNumber
-    timestamp created_at
-    timestamp updated_at
-  }
-
   FAVORITES {
     int id PK
     int user_id FK
     int book_id FK
     timestamp created_at
-    timestamp updated_at
   }
 
   WATCH_LATERS {
@@ -128,21 +112,13 @@ erDiagram
     int user_id FK
     int book_id FK
     timestamp created_at
-    timestamp updated_at
   }
 
-  WAITING {
+  FOLLOWS {
     int id PK
-    int id_user FK
-    varchar title
-    varchar author
-    text description
-    varchar cover_img
-    varchar link
-    int genre_id FK
-    varchar status
+    int follower_user_id FK
+    int followed_user_id FK
     timestamp created_at
-    timestamp updated_at
   }
 
   CONTACTS {
@@ -150,10 +126,24 @@ erDiagram
     varchar name
     varchar email
     text message
-    varchar status
+    int status
+    timestamp created_at
+  }
+
+  WAITS {
+    int id PK
+    int user_id FK
+    varchar title
+    varchar author
+    text description
+    varchar cover_img
+    varchar link
+    int genre_id FK
+    int status
     timestamp created_at
     timestamp updated_at
   }
+
 ```
 ## 3. Sơ đồ lớp (Class Diagram)
 
