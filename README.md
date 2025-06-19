@@ -165,7 +165,8 @@ classDiagram
         avatar
         bio
         role
-        // ...
+        created_at
+        updated_at
     }
     class Book {
         id
@@ -178,7 +179,8 @@ classDiagram
         genre_id
         views
         favorites
-        // ...
+        created_at
+        updated_at
     }
     class Wait {
         id
@@ -190,7 +192,8 @@ classDiagram
         link
         genre_id
         status
-        // ...
+        created_at
+        updated_at
     }
     class Comment {
         id
@@ -198,12 +201,14 @@ classDiagram
         book_id
         parent_id
         content
-        // ...
+        created_at
+        updated_at
     }
     class Category {
         id
         name
-        // ...
+        created_at
+        updated_at
     }
 ```
 
